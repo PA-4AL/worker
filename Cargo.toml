@@ -1,0 +1,30 @@
+[package]
+name = "worker"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "worker"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+google-cloud-pubsub = "0.27"
+google-cloud-googleapis = { version = "0.14", features = ["pubsub"] }
+
+calamine = "0.24"
+base64 = { version = "0.22", features = ["alloc"] }
+
+thiserror = "1"
+anyhow = "1"
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+dotenvy = "0.15"
+rust_xlsxwriter = "0.96.0"
