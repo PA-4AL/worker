@@ -73,12 +73,6 @@ jobs:
             exit 1
           fi
 
-      - name: Messages en attente sur la file
-        run: |
-          gcloud pubsub subscriptions describe pa-prod-worker-demandes \
-            --format='value(name)' >/dev/null
-          echo "Abonnement présent. Consommation observable dans les métriques Pub/Sub."
-
       - name: Récapitulatif
         if: always()
         run: |
