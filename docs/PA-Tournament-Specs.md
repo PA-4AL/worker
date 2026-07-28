@@ -90,7 +90,7 @@ Inspiration UX : Challonge / Toornament.
 
 ### 6.1 Décisions de modélisation
 
-1. **Communication Backend / Worker** : table `jobs` en BDD, pollée par le Worker Rust. Simple, gratuit, suffisant pour de l'import/export de fichiers. Migrable vers Pub/Sub plus tard si besoin.
+1. **Communication Backend / Worker** : ~~table `jobs` en BDD, pollée par le Worker Rust~~ → **migré vers Pub/Sub** (juillet 2026). La table `jobs` reste la trace de l'état des traitements (statut, erreur, fichier), mais le déclenchement passe par une file : plus de polling, une file de rebut et une politique de reprise gérées par le service, et un worker sans accès à la base. Détail : `infra/docs/ARCHITECTURE.md`.
 2. **Import Excel** : le modèle couvre les deux cas — import de membres dans une équipe existante, et import en masse de plusieurs équipes pour un tournoi.
 3. **Joueurs importés sans compte** : créés comme utilisateurs "fantômes" (`users.keycloak_id` nullable). Le jour où la personne se connecte via Keycloak, son compte est rattaché à la fiche existante (matching par email).
 
@@ -292,4 +292,4 @@ erDiagram
 |---|---|
 | **Backend Kotlin/Spring** | API REST, logique métier complète : génération et gestion des brackets, cycle de vie des tournois, matchs/scores/litiges, inscriptions |
 | **Worker Rust** | Traitement asynchrone des fichiers Excel : import des membres d'équipes (parsing, validation, insertion) et export (génération `.xlsx`) |
-| **Communication Backend ↔ Worker** | Table `jobs` en BDD pollée par le Worker (décision 6.1.1 — migrable vers Pub/Sub si besoin) |
+| **Communication Backend ↔ Worker** | **Pub/Sub** : le backend publie sur `topic-demandes`, le worker consomme en pull et répond sur `topic-reponses` (poussé vers le backend par abonnement push OIDC). La table `jobs` ne sert plus qu’au suivi d’état, plus de polling — voir `infra/docs/ARCHITECTURE.md` |
