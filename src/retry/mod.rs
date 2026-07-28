@@ -1,6 +1,6 @@
+use crate::errors::WorkerError;
 use std::future::Future;
 use std::time::Duration;
-use crate::errors::WorkerError;
 
 pub struct RetryPolicy {
     pub max_attempts: u32,
@@ -70,6 +70,9 @@ where
 
     match last_error {
         Some(e) => Err((e, policy.max_attempts)),
-        None => Err((WorkerError::ParseError("max_attempts must be > 0".into()), 0)),
+        None => Err((
+            WorkerError::ParseError("max_attempts must be > 0".into()),
+            0,
+        )),
     }
 }

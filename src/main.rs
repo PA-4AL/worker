@@ -1,9 +1,10 @@
+use google_cloud_pubsub::client::{Client, ClientConfig};
 use std::time::Duration;
 use tokio_util::sync::CancellationToken;
-use google_cloud_pubsub::client::{Client, ClientConfig};
 
 mod config;
 mod errors;
+mod health;
 mod models;
 mod parser;
 mod queue;
@@ -22,16 +23,6 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     let config = Config::from_env()?;
-    tracing::info!("Config loaded, connecting to Pub/Sub...");
-
-    let gcp_config = ClientConfig::default().with_auth().await?;
-    let client = Client::new(gcp_config).await?;
-
-    let subscription = client.subscription(&config.subscription_demands);
-    let topic = client.topic(&config.topic_responses);
-
-    let consumer = QueueConsumer::new(subscription);
-    let producer = QueueProducer::new(topic);
 
     let shutdown = CancellationToken::new();
 
@@ -58,7 +49,25 @@ async fn main() -> anyhow::Result<()> {
         });
     }
 
+    // Sonde HTTP : exigée par Cloud Run, qui tue une révision qui n'écoute pas
+    // sur $PORT (le vrai travail reste le pull Pub/Sub ci-dessous). Démarrée
+    // AVANT la connexion Pub/Sub pour que le conteneur réponde même si
+    // l'authentification GCP est lente.
+    tokio::spawn(health::serve(config.port, shutdown.clone()));
+
+    tracing::info!("Config loaded, connecting to Pub/Sub...");
+
+    let gcp_config = ClientConfig::default().with_auth().await?;
+    let client = Client::new(gcp_config).await?;
+
+    let subscription = client.subscription(&config.subscription_demands);
+    let topic = client.topic(&config.topic_responses);
+
+    let consumer = QueueConsumer::new(subscription);
+    let producer = QueueProducer::new(topic);
+
     tracing::info!(
+        project = %config.gcp_project_id,
         subscription = %config.subscription_demands,
         "Worker started, listening for messages"
     );

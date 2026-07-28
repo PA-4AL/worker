@@ -6,9 +6,6 @@ pub struct EsportParser;
 
 impl SchemaParser for EsportParser {
     fn player_fields(&self) -> &'static [(&'static str, &'static str)] {
-        &[
-            ("username", "Pseudo"),
-            ("rank", "Rang"),
-        ]
+        &[("username", "Pseudo"), ("rank", "Rang")]
     }
 }

@@ -1,11 +1,11 @@
-pub mod traits;
-pub mod football;
 pub mod esport;
+pub mod football;
+pub mod traits;
 
 use crate::errors::WorkerError;
-use traits::SchemaParser;
-use football::FootballParser;
 use esport::EsportParser;
+use football::FootballParser;
+use traits::SchemaParser;
 
 /// Retourne le parser correspondant au type de tournoi.
 /// Ajouter un nouveau type de tournoi = ajouter un parser ici.

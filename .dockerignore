@@ -1,0 +1,11 @@
+# Contexte de build : sans cette liste, `COPY . .` embarquerait target/ (plusieurs Go).
+target
+.git
+.gitignore
+.idea
+.claude
+.env
+.env.*
+!.env.example
+docs
+*.md

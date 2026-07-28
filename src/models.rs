@@ -57,7 +57,11 @@ impl WorkerResponse {
             task_type,
             status: ResponseStatus::Error,
             data: None,
-            error: Some(ErrorDetail { code, message, attempts }),
+            error: Some(ErrorDetail {
+                code,
+                message,
+                attempts,
+            }),
         }
     }
 }

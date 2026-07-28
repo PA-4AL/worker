@@ -1,8 +1,8 @@
+use crate::errors::WorkerError;
+use crate::models::WorkerResponse;
 use google_cloud_googleapis::pubsub::v1::PubsubMessage;
 use google_cloud_pubsub::publisher::Publisher;
 use google_cloud_pubsub::topic::Topic;
-use crate::errors::WorkerError;
-use crate::models::WorkerResponse;
 
 pub struct QueueProducer {
     publisher: Publisher,
@@ -16,8 +16,8 @@ impl QueueProducer {
     }
 
     pub async fn publish(&self, response: &WorkerResponse) -> Result<(), WorkerError> {
-        let json = serde_json::to_string(response)
-            .map_err(|e| WorkerError::QueueError(e.to_string()))?;
+        let json =
+            serde_json::to_string(response).map_err(|e| WorkerError::QueueError(e.to_string()))?;
 
         let msg = PubsubMessage {
             data: json.into_bytes(),

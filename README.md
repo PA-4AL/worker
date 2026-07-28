@@ -1,5 +1,28 @@
 # PA Tournament — Worker (Rust)
 
+[![CI](https://github.com/PA-4AL/worker/actions/workflows/ci.yml/badge.svg)](https://github.com/PA-4AL/worker/actions/workflows/ci.yml)
+
+**Déploiement et contribution** — flow git, pipelines et mise en production sont
+documentés dans le repo `infra` :
+[GIT-FLOW](https://github.com/PA-4AL/infra/blob/main/docs/GIT-FLOW.md) ·
+[CI-CD](https://github.com/PA-4AL/infra/blob/main/docs/CI-CD.md) ·
+[DEPLOY](https://github.com/PA-4AL/infra/blob/main/docs/DEPLOY.md) ·
+[DOCKER](https://github.com/PA-4AL/infra/blob/main/docs/DOCKER.md)
+
+## Qualité (jouée par la CI à chaque commit et chaque PR)
+
+```bash
+cargo fmt --all --check
+cargo clippy --all-targets --locked -- -D warnings
+cargo test --locked
+```
+
+## Image de production
+
+```bash
+docker build -t pa-worker .   # distroless non-root, 33 Mo
+```
+
 Worker asynchrone de la plateforme de gestion de tournois esport.
 Il tourne en boucle, consomme les demandes du backend via **Google Cloud
 Pub/Sub** (`topic-demandes`), les traite, puis publie le résultat dans

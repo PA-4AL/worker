@@ -21,8 +21,8 @@ struct ImportExcelPayload {
 /// (dans l'ordre d'apparition) et renvoie la liste des équipes prêtes
 /// à être inscrites au tournoi par le backend.
 pub async fn execute(payload: serde_json::Value) -> Result<serde_json::Value, WorkerError> {
-    let payload: ImportExcelPayload = serde_json::from_value(payload)
-        .map_err(|e| WorkerError::InvalidPayload(e.to_string()))?;
+    let payload: ImportExcelPayload =
+        serde_json::from_value(payload).map_err(|e| WorkerError::InvalidPayload(e.to_string()))?;
 
     let bytes = STANDARD.decode(&payload.file_base64)?;
 
@@ -51,7 +51,11 @@ pub async fn execute(payload: serde_json::Value) -> Result<serde_json::Value, Wo
         .map(|cell| match cell {
             Data::String(s) => s.trim().to_string(),
             Data::Float(f) => {
-                if f.fract() == 0.0 { (*f as i64).to_string() } else { f.to_string() }
+                if f.fract() == 0.0 {
+                    (*f as i64).to_string()
+                } else {
+                    f.to_string()
+                }
             }
             Data::Int(i) => i.to_string(),
             _ => String::new(),
@@ -167,10 +171,7 @@ mod tests {
 
     #[tokio::test]
     async fn import_echoue_si_colonne_equipe_absente() {
-        let file = xlsx_base64(&[
-            &["Pseudo", "Rang"],
-            &["alice", "Diamant"],
-        ]);
+        let file = xlsx_base64(&[&["Pseudo", "Rang"], &["alice", "Diamant"]]);
         let payload = serde_json::json!({
             "tournament_type": "esport_5v5",
             "file_base64": file,
@@ -182,10 +183,7 @@ mod tests {
 
     #[tokio::test]
     async fn import_echoue_si_cellule_equipe_vide() {
-        let file = xlsx_base64(&[
-            &["Équipe", "Pseudo", "Rang"],
-            &["", "alice", "Diamant"],
-        ]);
+        let file = xlsx_base64(&[&["Équipe", "Pseudo", "Rang"], &["", "alice", "Diamant"]]);
         let payload = serde_json::json!({
             "tournament_type": "esport_5v5",
             "file_base64": file,
