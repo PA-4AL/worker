@@ -62,9 +62,11 @@ jobs:
         run: |
           # Une révision prête = le conteneur écoute sur $PORT (sonde health) et
           # n'a pas planté au démarrage (échec d'authentification Pub/Sub, etc.).
+          # Filtre exact via jq : `--filter type:Ready` de gcloud matche aussi
+          # RoutesReady et ConfigurationsReady, et renvoie « True;True;True ».
           READY=$(gcloud run services describe pa-prod-worker \
-            --region ${{ vars.GCP_REGION }} \
-            --format='value(status.conditions.filter("type:Ready").firstof("status"))')
+            --region ${{ vars.GCP_REGION }} --format=json \
+            | jq -r '[.status.conditions[] | select(.type == "Ready") | .status] | first')
           echo "Condition Ready : $READY"
           if [ "$READY" != "True" ]; then
             echo "::error::Révision non prête — consulter les logs : gcloud run services logs read pa-prod-worker --region ${{ vars.GCP_REGION }}"
