@@ -71,8 +71,8 @@ struct Standing {
 /// (équipes + matchs) dans le payload, à n'importe quel moment du tournoi.
 /// Le fichier généré contient trois feuilles : Équipes, Matchs, Classement.
 pub async fn execute(payload: serde_json::Value) -> Result<serde_json::Value, WorkerError> {
-    let payload: ExportExcelPayload = serde_json::from_value(payload)
-        .map_err(|e| WorkerError::InvalidPayload(e.to_string()))?;
+    let payload: ExportExcelPayload =
+        serde_json::from_value(payload).map_err(|e| WorkerError::InvalidPayload(e.to_string()))?;
 
     let parser = parser::get_parser(&payload.tournament_type)?;
 
@@ -143,7 +143,15 @@ fn write_matches_sheet(
     let mut write = SheetWriter::new(sheet);
     write.header_row(
         header,
-        &["Round", "Équipe A", "Score A", "Score B", "Équipe B", "Statut", "Vainqueur"],
+        &[
+            "Round",
+            "Équipe A",
+            "Score A",
+            "Score B",
+            "Équipe B",
+            "Statut",
+            "Vainqueur",
+        ],
     )?;
 
     for m in matches {
@@ -180,9 +188,7 @@ fn write_standings_sheet(
 
     for m in payload.matches.iter().filter(|m| m.is_finished()) {
         let (a, b) = (m.score_a.unwrap_or(0), m.score_b.unwrap_or(0));
-        for (team, my_score, other_score) in
-            [(&m.team_a, a, b), (&m.team_b, b, a)]
-        {
+        for (team, my_score, other_score) in [(&m.team_a, a, b), (&m.team_b, b, a)] {
             let entry = standings.entry(team.as_str()).or_default();
             entry.played += 1;
             entry.diff += my_score - other_score;
@@ -208,7 +214,16 @@ fn write_standings_sheet(
     let mut write = SheetWriter::new(sheet);
     write.header_row(
         header,
-        &["Position", TEAM_COLUMN, "Joués", "Victoires", "Nuls", "Défaites", "Diff", "Points"],
+        &[
+            "Position",
+            TEAM_COLUMN,
+            "Joués",
+            "Victoires",
+            "Nuls",
+            "Défaites",
+            "Diff",
+            "Points",
+        ],
     )?;
 
     for (position, (name, s)) in ranked.iter().enumerate() {
@@ -300,7 +315,11 @@ fn file_name(tournament_name: &str) -> String {
         })
         .collect();
     let slug = slug.trim_matches('_').to_string();
-    let slug = if slug.is_empty() { "tournoi".to_string() } else { slug };
+    let slug = if slug.is_empty() {
+        "tournoi".to_string()
+    } else {
+        slug
+    };
     format!("export_{slug}.xlsx")
 }
 
@@ -342,7 +361,10 @@ mod tests {
             .decode(result["file_base64"].as_str().unwrap())
             .unwrap();
         let mut workbook = open_workbook_auto_from_rs(Cursor::new(bytes)).unwrap();
-        assert_eq!(workbook.sheet_names(), vec!["Équipes", "Matchs", "Classement"]);
+        assert_eq!(
+            workbook.sheet_names(),
+            vec!["Équipes", "Matchs", "Classement"]
+        );
 
         // Feuille Équipes : 1 en-tête + 3 joueurs
         let teams = workbook.worksheet_range("Équipes").unwrap();

@@ -1,7 +1,7 @@
+use super::{export_excel, import_excel};
 use crate::errors::WorkerError;
 use crate::models::{IncomingMessage, WorkerResponse};
 use crate::retry::{execute_with_retry, RetryPolicy};
-use super::{export_excel, import_excel};
 
 pub async fn dispatch(msg: &IncomingMessage) -> WorkerResponse {
     let policy = RetryPolicy::for_task(&msg.task_type);
@@ -20,11 +20,7 @@ pub async fn dispatch(msg: &IncomingMessage) -> WorkerResponse {
     .await;
 
     match result {
-        Ok(data) => WorkerResponse::success(
-            msg.task_id.clone(),
-            msg.task_type.clone(),
-            data,
-        ),
+        Ok(data) => WorkerResponse::success(msg.task_id.clone(), msg.task_type.clone(), data),
         Err((e, attempts)) => WorkerResponse::error(
             msg.task_id.clone(),
             msg.task_type.clone(),

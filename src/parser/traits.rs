@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use calamine::Data;
 use crate::errors::WorkerError;
+use calamine::Data;
+use std::collections::HashMap;
 
 /// Colonne commune à tous les schémas d'import : rattache chaque ligne (joueur)
 /// à son équipe. C'est la clé de regroupement de l'import.

@@ -1,6 +1,6 @@
+use crate::errors::WorkerError;
 use google_cloud_pubsub::subscriber::ReceivedMessage;
 use google_cloud_pubsub::subscription::Subscription;
-use crate::errors::WorkerError;
 
 pub struct QueueConsumer {
     subscription: Subscription,
