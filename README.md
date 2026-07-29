@@ -29,6 +29,7 @@ Pub/Sub** (`topic-demandes`), les traite, puis publie le résultat dans
 `topic-réponses`. Il est complètement isolé du backend : **aucun accès à la
 base de données**, aucune communication synchrone.
 
+Décisions d'architecture : [`docs/adr/`](docs/adr/) ·
 Documentation : [`DOC.md`](DOC.md) (architecture, format des messages) ·
 [`DOC_TECHNIQUE.md`](DOC_TECHNIQUE.md) (explication fichier par fichier) ·
 [`PROJET.md`](PROJET.md) (suivi) · specs : [`docs/PA-Tournament-Specs.md`](docs/PA-Tournament-Specs.md).
